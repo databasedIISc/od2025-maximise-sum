@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimal Strategy Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            transition: background 1s;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .box {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #3498db;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .box.disabled {
+            background-color: #95a5a6;
+            color: #2c3e50;
+            pointer-events: none;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background-color: #27ae60;
+        }
+
+        #result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #confetti-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            display: none;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: gold;
+            animation: fall 2s linear infinite;
+        }
+
+        @keyframes fall {
+            from {
+                transform: translateY(-100px);
+            }
+            to {
+                transform: translateY(100vh);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Optimal Strategy Game</h1>
+    <div class="buttons">
+        <button class="btn" onclick="startGame(1)">Play as Player 1</button>
+        <button class="btn" onclick="startGame(2)">Play as Player 2</button>
+    </div>
+
+    <div class="container" id="box-container"></div>
+    <div id="result"></div>
+    <div id="confetti-container"></div>
+
+    <script>
+        let numbers = [];
+        let playerChoice = 1;
+        let leftIndex = 0, rightIndex = 13;
+        let playerScores = {1: 0, 2: 0};
+        let currentPlayer = 1;
+        let waiting = false;
+
+        async function startGame(player) {
+            playerChoice = player;
+            leftIndex = 0;
+            rightIndex = 13;
+            playerScores = {1: 0, 2: 0};
+            currentPlayer = 1;
+            waiting = false;
+            document.getElementById("result").innerHTML = "";
+            document.getElementById("box-container").innerHTML = "";
+            document.getElementById("confetti-container").style.display = "none";
+            document.querySelector('body').style.background = "#f4f4f4";
+
+            document.querySelector('.buttons').style.display = 'none';
+
+            let response = await fetch('/start-game', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ player: player })
+            });
+
+            let data = await response.json();
+            numbers = data.numbers;
+            displayBoxes();
+
+            if (playerChoice === 2) {
+                setTimeout(computerMove, 1000);
+            }
+        }
+
+        function displayBoxes() {
+            let container = document.getElementById('box-container');
+            container.innerHTML = '';
+
+            numbers.forEach((num, index) => {
+                let box = document.createElement('div');
+                box.classList.add('box');
+                box.textContent = num;
+                box.dataset.index = index;
+
+                if (index === leftIndex || index === rightIndex) {
+                    box.addEventListener('click', () => handlePlayerMove(index));
+                }
+
+                container.appendChild(box);
+            });
+
+            updateScoreDisplay();
+        }
+
+        async function handlePlayerMove(index) {
+            if (waiting || (index !== leftIndex && index !== rightIndex)) return;
+
+            let selectedBox = document.querySelector(`.box[data-index='${index}']`);
+            selectedBox.classList.add('disabled');
+
+            playerScores[currentPlayer] += numbers[index];
+
+            if (index === leftIndex) leftIndex++;
+            else rightIndex--;
+
+            updateClickableBoxes();
+            updateScoreDisplay();
+
+            currentPlayer = 3 - currentPlayer;
+            waiting = true;
+
+            if (leftIndex <= rightIndex) {
+                setTimeout(computerMove, 1000);
+            } else {
+                showFinalResult();
+            }
+        }
+
+        function updateClickableBoxes() {
+            let boxes = document.querySelectorAll('.box');
+            boxes.forEach((box, index) => {
+                if (index === leftIndex || index === rightIndex) {
+                    box.style.opacity = '1';
+                    box.addEventListener('click', () => handlePlayerMove(index));
+                } else {
+                    box.style.opacity = '1';
+                    box.removeEventListener('click', handlePlayerMove);
+                }
+            });
+        }
+
+        function showConfetti() {
+            let confettiContainer = document.getElementById("confetti-container");
+            confettiContainer.innerHTML = ""; // Clear previous confetti
+            confettiContainer.style.display = "block";
+
+            for (let i = 0; i < 100; i++) { // Generate 100 confetti pieces
+                let confetti = document.createElement("div");
+                confetti.classList.add("confetti");
+                confetti.style.left = `${Math.random() * 100}vw`; // Random horizontal position
+                confetti.style.animationDuration = `${Math.random() * 2 + 1}s`; // Random fall speed
+                confetti.style.backgroundColor = getRandomColor(); // Random color
+
+                confettiContainer.appendChild(confetti);
+            }
+
+            setTimeout(() => {
+                confettiContainer.style.display = "none"; // Hide after some time
+            }, 3000);
+        }
+
+        function getRandomColor() {
+            let colors = ["gold", "red", "blue", "green", "purple", "pink", "orange"];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        async function computerMove() {
+            let response = await fetch('/computer-move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    player: playerChoice,
+                    numbers: numbers.slice(leftIndex, rightIndex + 1)
+                })
+            });
+
+            let data = await response.json();
+            let move = data.choice;
+            let moveIndex = numbers.indexOf(move);
+
+            let selectedBox = document.querySelector(`.box[data-index='${moveIndex}']`);
+            selectedBox.classList.add('disabled');
+
+            playerScores[currentPlayer] += move;
+
+            if (moveIndex === leftIndex) leftIndex++;
+            else rightIndex--;
+
+            updateClickableBoxes();
+            updateScoreDisplay();
+
+            currentPlayer = 3 - currentPlayer;
+            waiting = false;
+
+            if (leftIndex > rightIndex) {
+                showFinalResult();
+            }
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('result').innerHTML = `
+                <h3>Scores</h3>
+                <p>Player 1: ${playerScores[1]}</p>
+                <p>Player 2: ${playerScores[2]}</p>
+            `;
+        }
+
+        function showFinalResult() {
+            let winnerText = playerScores[1] > playerScores[2] ? "Player 1 Wins!" :
+                            playerScores[2] > playerScores[1] ? "Player 2 Wins!" :
+                            "It's a Tie!";
+            
+            document.getElementById('box-container').innerHTML = "";
+            document.getElementById('result').innerHTML = `
+                <h2>Game Over</h2>
+                <p>Player 1 Score: ${playerScores[1]}</p>
+                <p>Player 2 Score: ${playerScores[2]}</p>
+                <h2>${winnerText}</h2>
+            `;
+
+            if (playerScores[playerChoice] > playerScores[3 - playerChoice]) {
+                showConfetti();
+            } else {
+                document.body.style.background = "#333";
+                document.getElementById("result").style.color = "white";
+            }
+        }
+
+    </script>
+
+</body>
+</html>
