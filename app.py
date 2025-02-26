@@ -4,10 +4,13 @@ import random
 app = Flask(__name__)
 
 def generate_numbers():
-    """Generates a shuffled sequence of numbers from 1 to 14."""
-    sequence = list(range(1, 15))
-    random.shuffle(sequence)
-    return sequence
+    """Generates 14 random numbers between 1 and 99 (inclusive) with an odd sum."""
+    while True:
+        sequence = [random.randint(1, 99) for _ in range(14)]
+        if sum(sequence) % 2 == 1:
+            random.shuffle(sequence)
+            return sequence
+
 
 def compute_dp_table(numbers):
     """Computes the DP table for the optimal strategy when the computer is Player 2."""
