@@ -4,9 +4,9 @@ import random
 app = Flask(__name__)
 
 def generate_numbers():
-    """Generates 14 random numbers between 1 and 99 (inclusive) with an odd sum."""
+    """Generates 14 unique random numbers between 1 and 99 (inclusive) with an odd sum."""
     while True:
-        sequence = [random.randint(1, 99) for _ in range(14)]
+        sequence = random.sample(range(1, 100), 14)  # Ensures unique numbers
         if sum(sequence) % 2 == 1:
             random.shuffle(sequence)
             return sequence
