@@ -4,12 +4,10 @@ import random
 app = Flask(__name__)
 
 def generate_numbers():
-    """Generates 14 unique random numbers between 1 and 99 (inclusive) with an odd sum."""
-    while True:
-        sequence = random.sample(range(1, 100), 14)  # Ensures unique numbers
-        if sum(sequence) % 2 == 1:
-            random.shuffle(sequence)
-            return sequence
+    """Generates a shuffled sequence of numbers from 1 to 14."""
+    sequence = list(range(1, 15))
+    random.shuffle(sequence)
+    return sequence
 
 
 def compute_dp_table(numbers):
