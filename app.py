@@ -55,7 +55,7 @@ def computer_move():
     """Handles the computer's move based on the strategy."""
     data = request.get_json()
     numbers = data['numbers']
-    left, right = 0, len(numbers) - 1
+    left, right = data['left'], data['right']
     explanation = "bruh"
 
     if left > right:
@@ -65,21 +65,21 @@ def computer_move():
     if data['player'] == 1:
         # If the user plays as Player 1, the computer (Player 2) uses DP strategy
         dp = compute_dp_table(numbers)
-        if (dp[left+1][right] if left+1 <= right else 0) <= (dp[left][right-1] if left <= right-1 else 0):
+        if dp[left+1][right] <= dp[left][right-1]:
             choice = numbers[left]
         else:
             choice = numbers[right]
-        if left != right:
-            print(dp[left+1][right], dp[left][right-1], choice)
     else:
-        explanation = "oddeven!!!!!!"
         # If the user is Player 2, the computer (Player 1) follows the corrected Odd-Even Strategy
         preferred_parity = data['strategy']
+        parity = "odd" if preferred_parity == 0 else "even"
 
         # Pick the leftmost or rightmost number that matches the preferred parity
         if left % 2 == preferred_parity:
             choice = numbers[left]
+            explanation = "I pick the <b>leftmost</b> number ("+str(numbers[left])+"), since it is " + parity + "-indexed."
         else:
+            explanation = "I pick the <b>rightmost</b> number ("+str(numbers[right])+"), since it is " + parity + "-indexed."
             choice = numbers[right]
 
     return jsonify({"choice": choice, "explanation": explanation})

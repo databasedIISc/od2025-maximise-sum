@@ -6,6 +6,7 @@ let leftIndex = 0, rightIndex = boardLength - 1;
 let playerScores = {1: 0, 2: 0};
 let currentPlayer = 1;
 let waiting = false;
+let strategy = 0;
 
 async function startGame(player) {
     playerChoice = player;
@@ -29,6 +30,7 @@ async function startGame(player) {
 
     let data = await response.json();
     numbers = data.numbers;
+    strategy = data.strategy;
     displayBoxes();
 
     if (playerChoice === 2) {
@@ -136,7 +138,10 @@ async function computerMove() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             player: playerChoice,
-            numbers: numbers.slice(leftIndex, rightIndex + 1)
+            numbers: numbers,
+            left: leftIndex,
+            right: rightIndex,
+            strategy: strategy
         })
     });
 
