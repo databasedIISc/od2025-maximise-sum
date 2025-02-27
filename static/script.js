@@ -231,9 +231,15 @@ function addInfoMsg(msg) {
 
 function toggleExplanation() {
     let x = document.getElementById("explain");
-    if (x.style.display === "none") {
-        x.style.display = "block";
+    let y = document.getElementById("eshowbtn");
+    if (x.style.display === "none" || x.style.display === "") {
+        x.style.display = "flex";
     } else {
         x.style.display = "none";
+    }
+    if (y.style.display === "none") {
+        y.style.display = "block";
+    } else {
+        y.style.display = "none";
     }
 }
