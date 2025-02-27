@@ -69,16 +69,20 @@ def computer_move():
         if left == right:
             explanation = "Since there is only one number ("+str(numbers[left])+") left, I must pick it."
             choice = numbers[left]
-        elif dp[left+1][right] <= dp[left][right-1]:
-            explanation = ("Picking the leftmost number leaves you with a maximum possible score of "
+        elif dp[left+1][right] < dp[left][right-1]:
+            explanation = ("Picking the leftmost number leaves you with a maximum remaining score of "
             +str(dp[left+1][right])+" while the righmost one leaves you with "+str(dp[left][right-1])
             +".<br><br>So, I pick the <b>leftmost</b> number ("+str(numbers[left])+").")
             choice = numbers[left]
-        else:
-            explanation = ("Picking the leftmost number leaves you with a maximum possible score of "
+        elif dp[left+1][right] > dp[left][right-1]:
+            explanation = ("Picking the leftmost number leaves you with a maximum remaining score of "
             +str(dp[left+1][right])+" while the righmost one leaves you with "+str(dp[left][right-1])
             +".<br><br>So, I pick the <b>rightmost</b> number ("+str(numbers[right])+").")
             choice = numbers[right]
+        else:
+            explanation = ("Picking either the leftmost or the rightmost number leaves you with a maximum remaining score of "
+            +str(dp[left+1][right])+".<br><br>So, I can pick any one. I pick the <b>leftmost</b> number ("+str(numbers[left])+").")
+            choice = numbers[left]
     else:
         # If the user is Player 2, the computer (Player 1) follows the corrected Odd-Even Strategy
         preferred_parity = data['strategy']

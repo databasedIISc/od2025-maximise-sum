@@ -50,7 +50,7 @@ async function startGame(player) {
         setTimeout(addComputerMsg, 500, "Since I am going second, I must use <b>dynamic programming</b>"+
             " to find my strategy.<br><br>I will calculate the DP table, which contains the maximum possible score"+
             " for each portion of the board. Then, at each turn, I will pick the number which leaves you with" +
-            " the lesser maximum possible score. This is the best strategy, even though I am "+
+            " the lesser maximum remaining score. This is the best strategy, even though I am "+
             "not guaranteed to win.");
     }
 }
