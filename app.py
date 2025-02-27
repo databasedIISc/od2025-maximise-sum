@@ -65,9 +65,19 @@ def computer_move():
     if data['player'] == 1:
         # If the user plays as Player 1, the computer (Player 2) uses DP strategy
         dp = compute_dp_table(numbers)
-        if dp[left+1][right] <= dp[left][right-1]:
+
+        if left == right:
+            explanation = "Since there is only one number ("+str(numbers[left])+") left, I must pick it."
+            choice = numbers[left]
+        elif dp[left+1][right] <= dp[left][right-1]:
+            explanation = ("Picking the leftmost number leaves you with a maximum possible score of "
+            +str(dp[left+1][right])+" while the righmost one leaves you with "+str(dp[left][right-1])
+            +".<br><br>So, I pick the <b>leftmost</b> number ("+str(numbers[left])+").")
             choice = numbers[left]
         else:
+            explanation = ("Picking the leftmost number leaves you with a maximum possible score of "
+            +str(dp[left+1][right])+" while the righmost one leaves you with "+str(dp[left][right-1])
+            +".<br><br>So, I pick the <b>rightmost</b> number ("+str(numbers[right])+").")
             choice = numbers[right]
     else:
         # If the user is Player 2, the computer (Player 1) follows the corrected Odd-Even Strategy

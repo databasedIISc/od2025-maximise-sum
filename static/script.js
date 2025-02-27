@@ -34,7 +34,7 @@ async function startGame(player) {
     displayBoxes();
 
     if (playerChoice === 2) {
-        setTimeout(computerMove, 1000);
+        setTimeout(computerMove, 1500);
         
         // techincally, based on the existing organisation,
         // we should do this in the backend
@@ -42,10 +42,16 @@ async function startGame(player) {
         for (i = 0; i < numbers.length; i++) {
             if ((i+1) % 2 == 0) es += numbers[i];
             else os += numbers[i]; }
-        addComputerMsg("Since I am going first, I can use the <b>odd-even "+
-        "strategy</b>. I see that the sum of the odd-indexed numbers is <b>" + os + "</b> while " +
+        setTimeout(addComputerMsg, 500, "Since I am going first, I can use the <b>odd-even "+
+        "strategy</b>.<br><br>I see that the sum of the odd-indexed numbers is <b>" + os + "</b> while " +
         "that of the even-indexed ones is <b>" + es + "</b>. So, I will try to pick the "+
         (os > es ? "odd" : "even") + "-indexed numbers.");
+    } else {
+        setTimeout(addComputerMsg, 500, "Since I am going second, I must use <b>dynamic programming</b>"+
+            " to find my strategy.<br><br>I will calculate the DP table, which contains the maximum possible score"+
+            " for each portion of the board. Then, at each turn, I will pick the number which leaves you with" +
+            " the lesser maximum possible score. This is the best strategy, even though I am "+
+            "not guaranteed to win.");
     }
 }
 
