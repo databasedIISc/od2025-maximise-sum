@@ -33,6 +33,7 @@ async function startGame(player) {
     strategy = data.strategy;
     displayBoxes();
 
+    addInfoMsg("The game has started.");
     if (playerChoice === 2) {
         setTimeout(computerMove, 1500);
         
@@ -188,6 +189,7 @@ function showFinalResult() {
                     playerScores[2] > playerScores[1] ? "Player 2 Wins!" :
                     "It's a Tie!";
     
+    addInfoMsg("The game is over. " + winnerText + "<br><br>");
     document.getElementById('box-container').innerHTML = "";
     document.getElementById('result').innerHTML = `
         <h2>Game Over</h2>
@@ -215,6 +217,13 @@ function addComputerMsg(msg) {
 function addPlayerMsg(msg) {
     let txt = "<div class=\"emsg ymsg\">" + msg + "</div>";
     console.log(txt);
+    let e = document.getElementById("explainc");
+    e.insertAdjacentHTML('beforeend', txt);
+    e.lastElementChild.scrollIntoView();
+}
+
+function addInfoMsg(msg) {
+    let txt = "<div class=\"einfo\">" + msg + "</div>";
     let e = document.getElementById("explainc");
     e.insertAdjacentHTML('beforeend', txt);
     e.lastElementChild.scrollIntoView();
