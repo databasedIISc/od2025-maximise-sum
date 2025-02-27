@@ -3,9 +3,9 @@ import random
 
 app = Flask(__name__)
 
-def generate_numbers():
+def generate_numbers(n):
     """Generates a shuffled sequence of numbers from 1 to 14."""
-    sequence = list(range(1, 15))
+    sequence = list(range(1, n+1))
     random.shuffle(sequence)
     return sequence
 
@@ -44,7 +44,8 @@ def home():
 @app.route('/start-game', methods=['POST'])
 def start_game():
     """Starts a new game and sends the generated numbers to the frontend."""
-    numbers = generate_numbers()
+    boardLength = request.get_json()['boardLength']
+    numbers = generate_numbers(boardLength)
     return jsonify({"numbers": numbers})
 
 @app.route('/computer-move', methods=['POST'])
@@ -53,18 +54,23 @@ def computer_move():
     data = request.get_json()
     numbers = data['numbers']
     left, right = 0, len(numbers) - 1
+    explanation = "bruh"
 
     if left > right:
         return jsonify({"choice": None})  # No valid moves left
 
+    # If the user plays as Player 1, the computer (Player 2) uses DP strategy
     if data['player'] == 1:
         # If the user plays as Player 1, the computer (Player 2) uses DP strategy
         dp = compute_dp_table(numbers)
-        if dp[left+1][right] if left+1 <= right else 0 <= dp[left][right-1] if left <= right-1 else 0:
-            choice = numbers[right]
-        else:
+        if (dp[left+1][right] if left+1 <= right else 0) <= (dp[left][right-1] if left <= right-1 else 0):
             choice = numbers[left]
+        else:
+            choice = numbers[right]
+        if left != right:
+            print(dp[left+1][right], dp[left][right-1], choice)
     else:
+        explanation = "oddeven!!!!!!"
         # If the user is Player 2, the computer (Player 1) follows the corrected Odd-Even Strategy
         preferred_parity = odd_even_strategy(numbers)
 
@@ -74,7 +80,7 @@ def computer_move():
         else:
             choice = numbers[right]
 
-    return jsonify({"choice": choice})
+    return jsonify({"choice": choice, "explanation": explanation})
 
 if __name__ == '__main__':
     app.run(debug=True)
