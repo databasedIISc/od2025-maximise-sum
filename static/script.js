@@ -35,7 +35,8 @@ async function startGame(player) {
 
     addInfoMsg("The game has started.");
     if (playerChoice === 2) {
-        setTimeout(computerMove, 1500);
+        waiting = true;
+        setTimeout(computerMove, 1000);
         
         // techincally, based on the existing organisation,
         // we should do this in the backend
@@ -63,7 +64,7 @@ function displayBoxes() {
     numbers.forEach((num, index) => {
         let box = document.createElement('div');
         box.classList.add('box');
-        box.textContent = num;
+        box.innerHTML = num + "<div class=\"index\">" + (index+1) + "</div>";
         box.dataset.index = index;
 
         if (index === leftIndex || index === rightIndex) {
@@ -203,6 +204,7 @@ function showFinalResult() {
     } else {
         document.body.style.background = "#333";
         document.getElementById("result").style.color = "white";
+        document.getElementById("title").style.color = "white";
     }
 }
 
