@@ -9,6 +9,7 @@ def generate_numbers(n):
     random.shuffle(sequence)
     return sequence
 
+
 def compute_dp_table(numbers):
     """Computes the DP table for the optimal strategy when the computer is Player 2."""
     n = len(numbers)
@@ -46,7 +47,8 @@ def start_game():
     """Starts a new game and sends the generated numbers to the frontend."""
     boardLength = request.get_json()['boardLength']
     numbers = generate_numbers(boardLength)
-    return jsonify({"numbers": numbers})
+    parity = odd_even_strategy(numbers)
+    return jsonify({"numbers": numbers, "strategy": parity})
 
 @app.route('/computer-move', methods=['POST'])
 def computer_move():
@@ -72,7 +74,7 @@ def computer_move():
     else:
         explanation = "oddeven!!!!!!"
         # If the user is Player 2, the computer (Player 1) follows the corrected Odd-Even Strategy
-        preferred_parity = odd_even_strategy(numbers)
+        preferred_parity = data['strategy']
 
         # Pick the leftmost or rightmost number that matches the preferred parity
         if left % 2 == preferred_parity:
