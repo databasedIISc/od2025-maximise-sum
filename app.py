@@ -46,7 +46,8 @@ def home():
 def start_game():
     """Starts a new game and sends the generated numbers to the frontend."""
     numbers = generate_numbers()
-    return jsonify({"numbers": numbers})
+    parity = odd_even_strategy(numbers)
+    return jsonify({"numbers": numbers, "strategy": parity})
 
 @app.route('/computer-move', methods=['POST'])
 def computer_move():
@@ -67,7 +68,7 @@ def computer_move():
             choice = numbers[left]
     else:
         # If the user is Player 2, the computer (Player 1) follows the corrected Odd-Even Strategy
-        preferred_parity = odd_even_strategy(numbers)
+        preferred_parity = data['strategy']
 
         # Pick the leftmost or rightmost number that matches the preferred parity
         if left % 2 == preferred_parity:
